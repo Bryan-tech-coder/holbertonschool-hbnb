@@ -1,11 +1,6 @@
 #!/usr/bin/python3
-"""
-Base model for all entities
-"""
-
 import uuid
 from datetime import datetime
-
 
 class BaseModel:
     def __init__(self):
@@ -15,3 +10,10 @@ class BaseModel:
 
     def save(self):
         self.updated_at = datetime.utcnow()
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat(),
+        }

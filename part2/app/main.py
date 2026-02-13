@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 from flask import Flask
 from flask_restx import Api
-from app.api.v1.routes import api as users_api       # Users
-from app.api.v1.place_routes import api as places_api    # Places
-from app.api.v1.amenity_routes import api as amenities_api  # Amenities
+from app.api.v1.routes import api as users_api
+from app.api.v1.place_routes import api as places_api
+from app.api.v1.amenity_routes import api as amenities_api
 
 def create_app():
     app = Flask(__name__)
@@ -15,3 +15,7 @@ def create_app():
     api.add_namespace(amenities_api)
 
     return app
+
+if __name__ == "__main__":
+    app = create_app()
+    app.run(debug=True)

@@ -1,22 +1,42 @@
 #!/usr/bin/python3
-from app.models.base_model import BaseModel
+from app.models.base_model import BaseModel  
 
 
 class Place(BaseModel):
-    def __init__(self, title, description, price, owner_id):
+    def __init__(self, name, owner_id, description="", number_rooms=0,
+                 number_bathrooms=0, max_guest=0, price_by_night=0.0,
+                 latitude=0.0, longitude=0.0, amenity_ids=None):
         super().__init__()
-
-        if not title or not owner_id:
-            raise ValueError("Place must have a title and owner")
-
-        if price < 0:
+        if not name or not owner_id:
+            raise ValueError("Place must have a name and owner")
+        if price_by_night < 0:
             raise ValueError("Price must be positive")
 
-        self.title = title
+        self.name = name
         self.description = description
-        self.price = price
+        self.number_rooms = number_rooms
+        self.number_bathrooms = number_bathrooms
+        self.max_guest = max_guest
+        self.price_by_night = price_by_night
+        self.latitude = latitude
+        self.longitude = longitude
         self.owner_id = owner_id
+        self.amenity_ids = amenity_ids or []
+        self.review_ids = []  # <--- Aquí
 
-        # Relationships
-        self.reviews = []     # list of review IDs
-        self.amenities = []   # list of amenity IDs
+    def to_dict(self):
+        base = super().to_dict()
+        base.update({
+            "name": self.name,
+            "description": self.description,
+            "number_rooms": self.number_rooms,
+            "number_bathrooms": self.number_bathrooms,
+            "max_guest": self.max_guest,
+            "price_by_night": self.price_by_night,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "owner_id": self.owner_id,
+            "amenity_ids": self.amenity_ids,
+            "review_ids": self.review_ids
+        })
+        return base
