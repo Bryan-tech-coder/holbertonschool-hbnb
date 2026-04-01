@@ -1,6 +1,6 @@
-/* =========================
-   HBnB Part 4 - Client JS
-========================= */
+
+//HBnB Part 4 - Client JS#
+
 
 /* =======================
    Utilities: Cookies
@@ -43,6 +43,24 @@ function setupNavbarFooter() {
 }
 
 /* =======================
+   Logout
+======================= */
+function setupLogout() {
+  const token = getCookie('token');
+  if (!token) return;
+
+  const nav = document.querySelector('header nav');
+  const logoutLink = document.createElement('a');
+  logoutLink.href = "#";
+  logoutLink.textContent = "Logout";
+  logoutLink.addEventListener('click', () => {
+    deleteCookie('token');
+    window.location.href = 'index.html';
+  });
+  nav.appendChild(logoutLink);
+}
+
+/* =======================
    Check Authentication
 ======================= */
 function checkAuthentication() {
@@ -58,6 +76,16 @@ function checkAuthentication() {
 function setupLogin() {
   const loginForm = document.getElementById('login-form');
   if (!loginForm) return;
+
+  // Crear div para errores visibles
+  let errorDiv = document.getElementById('login-error');
+  if (!errorDiv) {
+    errorDiv = document.createElement('div');
+    errorDiv.id = 'login-error';
+    errorDiv.style.color = 'red';
+    errorDiv.style.marginBottom = '10px';
+    loginForm.prepend(errorDiv);
+  }
 
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -77,11 +105,11 @@ function setupLogin() {
         window.location.href = 'index.html';
       } else {
         const data = await response.json();
-        alert('Login failed: ' + (data.error || response.statusText));
+        errorDiv.textContent = data.error || response.statusText;
       }
     } catch (err) {
       console.error(err);
-      alert('Error connecting to server');
+      errorDiv.textContent = 'Error connecting to server';
     }
   });
 }
@@ -107,6 +135,11 @@ function displayPlaces(places) {
   const list = document.getElementById('places-list');
   if (!list) return;
   list.innerHTML = '';
+
+  if (!places || places.length === 0) {
+    list.innerHTML = '<p>No places available.</p>';
+    return;
+  }
 
   places.forEach(place => {
     const div = document.createElement('div');
@@ -135,10 +168,16 @@ function setupPriceFilter() {
   filter.addEventListener('change', (e) => {
     const value = e.target.value;
     const cards = document.querySelectorAll('.place-card');
+    let anyVisible = false;
     cards.forEach(card => {
       const price = parseFloat(card.querySelector('p:nth-child(3)').textContent.replace('Price: $', ''));
-      card.style.display = (value === 'All' || price <= parseFloat(value)) ? 'block' : 'none';
+      const visible = value === 'All' || price <= parseFloat(value);
+      card.style.display = visible ? 'block' : 'none';
+      if (visible) anyVisible = true;
     });
+
+    const list = document.getElementById('places-list');
+    if (!anyVisible) list.innerHTML = '<p>No places match your filter.</p>';
   });
 }
 
@@ -244,6 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupPriceFilter();
   setupAddReview();
   checkAuthentication();
+  setupLogout(); // logout dinámico
 
   if (document.getElementById('places-list')) fetchPlaces();
   if (document.getElementById('place-details')) fetchPlaceDetails();
