@@ -1,7 +1,7 @@
 /* =========================
    HBnB Part 4 - Client JS
    Compatible con todas las páginas
-   Puerto backend: 5002
+   Backend puerto: 5002
 ========================= */
 
 /* =======================
@@ -24,7 +24,28 @@ function deleteCookie(name) {
 }
 
 /* =======================
-   Check Auth & Toggle Login Link
+   Navbar y Footer
+======================= */
+function setupNavbarFooter() {
+  const header = document.querySelector('header');
+  if (header) {
+    header.innerHTML = `
+      <img src="images/logo.png" alt="HBnB Logo" class="logo">
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="login.html" id="login-link">Login</a>
+      </nav>
+    `;
+  }
+
+  const footer = document.querySelector('footer');
+  if (footer) {
+    footer.innerHTML = `<p>&copy; ${new Date().getFullYear()} HBnB. All rights reserved.</p>`;
+  }
+}
+
+/* =======================
+   Check Authentication
 ======================= */
 function checkAuthentication() {
   const token = getCookie('token');
@@ -68,7 +89,7 @@ function setupLogin() {
 }
 
 /* =======================
-   Fetch & Display Places
+   Index Page - Fetch & Display Places
 ======================= */
 async function fetchPlaces() {
   const token = checkAuthentication();
@@ -96,7 +117,6 @@ function displayPlaces(places) {
     div.style.padding = '10px';
     div.style.border = '1px solid #ddd';
     div.style.borderRadius = '10px';
-
     div.innerHTML = `
       <h3>${place.name}</h3>
       <p>${place.description}</p>
@@ -125,7 +145,7 @@ function setupPriceFilter() {
 }
 
 /* =======================
-   Fetch & Display Place Details
+   Place Details Page
 ======================= */
 async function fetchPlaceDetails() {
   const params = new URLSearchParams(window.location.search);
@@ -133,12 +153,11 @@ async function fetchPlaceDetails() {
   if (!placeId) return;
 
   const token = checkAuthentication();
-
   try {
     const response = await fetch(`http://127.0.0.1:5002/api/v1/places/${placeId}`, {
       headers: token ? { 'Authorization': `Bearer ${token}` } : {}
     });
-    if (!response.ok) throw new Error('Failed fetching place');
+    if (!response.ok) throw new Error('Failed fetching place details');
     const place = await response.json();
     displayPlaceDetails(place);
   } catch (err) {
@@ -171,13 +190,13 @@ function displayPlaceDetails(place) {
   });
   section.appendChild(reviewsSection);
 
-  // Show Add Review Form if Authenticated
+  // Mostrar Add Review solo si está autenticado
   const addReview = document.getElementById('add-review');
   if (addReview) addReview.style.display = getCookie('token') ? 'block' : 'none';
 }
 
 /* =======================
-   Add Review
+   Add Review Page
 ======================= */
 function setupAddReview() {
   const reviewForm = document.getElementById('review-form');
@@ -202,10 +221,11 @@ function setupAddReview() {
         },
         body: JSON.stringify({ comment: reviewText })
       });
+
       if (response.ok) {
         alert('Review submitted successfully!');
         reviewForm.reset();
-        fetchPlaceDetails(); // refresh reviews
+        fetchPlaceDetails();
       } else {
         const data = await response.json();
         alert('Failed: ' + (data.error || response.statusText));
@@ -221,6 +241,7 @@ function setupAddReview() {
    Initialize Page
 ======================= */
 document.addEventListener('DOMContentLoaded', () => {
+  setupNavbarFooter();
   setupLogin();
   setupPriceFilter();
   setupAddReview();
