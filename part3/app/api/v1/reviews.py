@@ -24,10 +24,10 @@ def create_review():
         return jsonify({"error": "You already reviewed this place"}), 403
 
     review = Review(
-        text=data["text"],
-        user_id=current_user_id,
-        place_id=place.id
-    )
+      text=data["text"],
+      user_id=current_user_id,
+      place_id=data["place_id"]
+)
 
     repository.add(review)
     return jsonify(review.to_dict()), 201
