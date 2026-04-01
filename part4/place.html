@@ -1,24 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>HBnB</title>
-  <link rel="stylesheet" href="styles/styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HBnB - Place Details</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
+<body>
+  <header></header>
 
-<div class="place-details">
-  <h1>Place Name</h1>
+  <main>
+    <section id="place-details">
+      <!-- Aquí se agregará dinámicamente la información del lugar -->
+    </section>
 
-  <div class="place-info">
-    <p>Host: Bryan</p>
-    <p>Price: $120</p>
-    <p>Description: ...</p>
-  </div>
-</div>
+    <!-- Add Review Section -->
+    <section id="add-review" style="display:none;">
+      <h2>Add Your Review</h2>
+      <form id="review-form">
+        <textarea id="review-text" rows="4" cols="50" placeholder="Write your review..." required></textarea>
+        <br>
+        <button type="submit">Submit Review</button>
+      </form>
+    </section>
+  </main>
 
-<div class="review-card">
-  <p>"Great place!"</p>
-  <p>User: John</p>
-  <p>Rating: ⭐⭐⭐⭐</p>
-</div>
-
- <a href="add_review.html" class="details-button">Add Review</a>
-</div>
+  <footer></footer>
+  <script src="scripts.js"></script>
+</body>
+</html>
