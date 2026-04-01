@@ -20,4 +20,4 @@ def serve_frontend(filename):
     return send_from_directory(PART4_DIR, filename)
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=5002)
