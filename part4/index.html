@@ -12,21 +12,19 @@
   <main>
     <h1>Places to Stay</h1>
 
-    <label for="price-filter">Filter by max price:</label>
+    <label for="price-filter">Filter by max price: </label>
     <select id="price-filter">
+      <option value="All">All</option>
       <option value="10">$10</option>
+      <option value="20">$20</option>
       <option value="50">$50</option>
       <option value="100">$100</option>
-      <option value="All">All</option>
     </select>
 
-    <section id="places-list">
-      <!-- Aquí se agregarán dinámicamente las tarjetas de lugares -->
-    </section>
+    <div id="places-list"></div>
   </main>
 
   <footer></footer>
-
   <script src="scripts.js"></script>
 </body>
 </html>

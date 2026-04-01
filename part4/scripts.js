@@ -1,6 +1,6 @@
-
-//HBnB Part 4 - Client JS#
-
+/* =========================
+   HBnB - Client JS
+========================= */
 
 /* =======================
    Utilities: Cookies
@@ -27,13 +27,27 @@ function deleteCookie(name) {
 function setupNavbarFooter() {
   const header = document.querySelector('header');
   if (header) {
+    const token = getCookie('token');
     header.innerHTML = `
       <img src="images/logo.png" alt="HBnB Logo" class="logo">
       <nav>
         <a href="index.html">Home</a>
         <a href="login.html" id="login-link">Login</a>
+        ${token ? '<a href="#" id="logout-link">Logout</a>' : ''}
       </nav>
     `;
+
+    const logoutLink = document.getElementById('logout-link');
+    if (logoutLink) {
+      logoutLink.addEventListener('click', () => {
+        deleteCookie('token');
+        window.location.href = 'login.html';
+      });
+    }
+
+    // Ocultar login si ya está autenticado
+    const loginLink = document.getElementById('login-link');
+    if (loginLink) loginLink.style.display = token ? 'none' : 'block';
   }
 
   const footer = document.querySelector('footer');
@@ -43,49 +57,12 @@ function setupNavbarFooter() {
 }
 
 /* =======================
-   Logout
-======================= */
-function setupLogout() {
-  const token = getCookie('token');
-  if (!token) return;
-
-  const nav = document.querySelector('header nav');
-  const logoutLink = document.createElement('a');
-  logoutLink.href = "#";
-  logoutLink.textContent = "Logout";
-  logoutLink.addEventListener('click', () => {
-    deleteCookie('token');
-    window.location.href = 'index.html';
-  });
-  nav.appendChild(logoutLink);
-}
-
-/* =======================
-   Check Authentication
-======================= */
-function checkAuthentication() {
-  const token = getCookie('token');
-  const loginLink = document.getElementById('login-link');
-  if (loginLink) loginLink.style.display = token ? 'none' : 'block';
-  return token;
-}
-
-/* =======================
    Login Page
 ======================= */
 function setupLogin() {
   const loginForm = document.getElementById('login-form');
+  const loginMessage = document.getElementById('login-message');
   if (!loginForm) return;
-
-  // Crear div para errores visibles
-  let errorDiv = document.getElementById('login-error');
-  if (!errorDiv) {
-    errorDiv = document.createElement('div');
-    errorDiv.id = 'login-error';
-    errorDiv.style.color = 'red';
-    errorDiv.style.marginBottom = '10px';
-    loginForm.prepend(errorDiv);
-  }
 
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -105,11 +82,11 @@ function setupLogin() {
         window.location.href = 'index.html';
       } else {
         const data = await response.json();
-        errorDiv.textContent = data.error || response.statusText;
+        loginMessage.textContent = 'Login failed: ' + (data.error || response.statusText);
       }
     } catch (err) {
       console.error(err);
-      errorDiv.textContent = 'Error connecting to server';
+      loginMessage.textContent = 'Error connecting to server';
     }
   });
 }
@@ -118,7 +95,7 @@ function setupLogin() {
    Index Page - Fetch & Display Places
 ======================= */
 async function fetchPlaces() {
-  const token = checkAuthentication();
+  const token = getCookie('token');
   try {
     const response = await fetch('http://127.0.0.1:5002/api/v1/places', {
       headers: token ? { 'Authorization': `Bearer ${token}` } : {}
@@ -136,18 +113,9 @@ function displayPlaces(places) {
   if (!list) return;
   list.innerHTML = '';
 
-  if (!places || places.length === 0) {
-    list.innerHTML = '<p>No places available.</p>';
-    return;
-  }
-
   places.forEach(place => {
     const div = document.createElement('div');
     div.className = 'place-card';
-    div.style.margin = '20px';
-    div.style.padding = '10px';
-    div.style.border = '1px solid #ddd';
-    div.style.borderRadius = '10px';
     div.innerHTML = `
       <h3>${place.name}</h3>
       <p>${place.description}</p>
@@ -167,17 +135,10 @@ function setupPriceFilter() {
 
   filter.addEventListener('change', (e) => {
     const value = e.target.value;
-    const cards = document.querySelectorAll('.place-card');
-    let anyVisible = false;
-    cards.forEach(card => {
+    document.querySelectorAll('.place-card').forEach(card => {
       const price = parseFloat(card.querySelector('p:nth-child(3)').textContent.replace('Price: $', ''));
-      const visible = value === 'All' || price <= parseFloat(value);
-      card.style.display = visible ? 'block' : 'none';
-      if (visible) anyVisible = true;
+      card.style.display = (value === 'All' || price <= parseFloat(value)) ? 'block' : 'none';
     });
-
-    const list = document.getElementById('places-list');
-    if (!anyVisible) list.innerHTML = '<p>No places match your filter.</p>';
   });
 }
 
@@ -189,7 +150,7 @@ async function fetchPlaceDetails() {
   const placeId = params.get('id');
   if (!placeId) return;
 
-  const token = checkAuthentication();
+  const token = getCookie('token');
   try {
     const response = await fetch(`http://127.0.0.1:5002/api/v1/places/${placeId}`, {
       headers: token ? { 'Authorization': `Bearer ${token}` } : {}
@@ -218,22 +179,17 @@ function displayPlaceDetails(place) {
   place.reviews.forEach(r => {
     const div = document.createElement('div');
     div.className = 'review-card';
-    div.style.margin = '20px';
-    div.style.padding = '10px';
-    div.style.border = '1px solid #ddd';
-    div.style.borderRadius = '10px';
     div.innerHTML = `<p>${r.comment} - ${r.user}</p>`;
     reviewsSection.appendChild(div);
   });
   section.appendChild(reviewsSection);
 
-  // Mostrar Add Review solo si está autenticado
-  const addReview = document.getElementById('add-review');
-  if (addReview) addReview.style.display = getCookie('token') ? 'block' : 'none';
+  const addReviewSection = document.getElementById('add-review');
+  if (addReviewSection) addReviewSection.style.display = getCookie('token') ? 'block' : 'none';
 }
 
 /* =======================
-   Add Review Page
+   Add Review
 ======================= */
 function setupAddReview() {
   const reviewForm = document.getElementById('review-form');
@@ -242,8 +198,8 @@ function setupAddReview() {
   reviewForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const token = checkAuthentication();
-    if (!token) return window.location.href = 'index.html';
+    const token = getCookie('token');
+    if (!token) return window.location.href = 'login.html';
 
     const params = new URLSearchParams(window.location.search);
     const placeId = params.get('id');
@@ -282,8 +238,6 @@ document.addEventListener('DOMContentLoaded', () => {
   setupLogin();
   setupPriceFilter();
   setupAddReview();
-  checkAuthentication();
-  setupLogout(); // logout dinámico
 
   if (document.getElementById('places-list')) fetchPlaces();
   if (document.getElementById('place-details')) fetchPlaceDetails();
