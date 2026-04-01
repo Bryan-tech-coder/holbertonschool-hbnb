@@ -212,7 +212,7 @@ function setupAddReview() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ comment: reviewText })
+        body: JSON.stringify({ text: reviewText })
       });
 
       if (response.ok) {

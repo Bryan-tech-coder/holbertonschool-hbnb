@@ -2,10 +2,12 @@ import os
 from app import create_app
 from config import Config
 from flask import send_from_directory
+from flask_cors import CORS
 
 app = create_app(Config)
+CORS(app)
 
-# 🔥 ruta absoluta correcta
+# ruta absoluta correcta
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PART4_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', 'part4'))
 
