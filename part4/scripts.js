@@ -1,7 +1,5 @@
 /* =========================
    HBnB Part 4 - Client JS
-   Compatible con todas las páginas
-   Backend puerto: 5002
 ========================= */
 
 /* =======================
