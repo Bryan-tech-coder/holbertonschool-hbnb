@@ -34,6 +34,20 @@ footer { padding: 12px 20px; text-align: center; color: #666; margin-top: 20px; 
 .hero-text h1 { margin: 0; font-size: 32px; text-shadow: 0 2px 6px rgba(0,0,0,0.35); }
 .hero-text p { margin: 6px 0 0 0; font-size: 16px; text-shadow: 0 1px 4px rgba(0,0,0,0.35); }
 
+/* Place hero for details */
+.place-hero { width: 100%; display: flex; justify-content: center; margin-bottom: 18px; }
+.place-hero-image { width: 100%; max-height: 360px; object-fit: cover; border-radius: 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+
+/* Loading spinner */
+.hbnb-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(0,0,0,0.1); border-left-color: var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; vertical-align: middle; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Disabled button style */
+.btn-disabled { opacity: 0.6; pointer-events: none; }
+
+/* Focus styles for accessibility */
+a:focus, button:focus, input:focus, textarea:focus { outline: 3px solid rgba(40,167,69,0.2); outline-offset: 2px; }
+
 /* Place details */
 #place-details { background: #fff; padding: 16px; border-radius: 10px; border: 1px solid #ddd; margin: 20px; }
 .place-info { color: #444; }

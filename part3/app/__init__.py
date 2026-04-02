@@ -48,4 +48,9 @@ def create_app(config_class):
         # Ignorar si no está disponible
         pass
 
+    # Simple healthcheck endpoint useful for docker/monitoring
+    @app.route('/health', methods=['GET'])
+    def health():
+        return { 'status': 'ok' }, 200
+
     return app

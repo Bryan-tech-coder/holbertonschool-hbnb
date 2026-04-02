@@ -1,30 +1,31 @@
 /* =========================
   HBnB - Client JS
-  Comentarios en español: este archivo controla el cliente (frontend)
-  - Maneja autenticación (cookies)
-  - Solicita datos al API (places, place details)
-  - Renderiza la interfaz: lista de lugares, detalles y formulario de reviews
+  All UI and comments in English for Holberton
+  - Handles authentication (JWT token)
+  - Fetches data from the API (places, details, reviews)
+  - Renders the interface: list of places, details, and review form
+  - Documented for demo and explanation
 ========================= */
 
 /* =======================
    Utilities: Cookies
 ======================= */
-// URL base del API (ajusta si tu API corre en otra dirección/puerto)
+// API base URL (adjust if your API runs on another address/port)
 const API_BASE = 'http://127.0.0.1:5002';
 
 /**
- * Resuelve una posible referencia a imagen proveniente del API.
- * - Si es una URL absoluta (http/https) se devuelve tal cual.
- * - Si es una ruta relativa (ej: /uploads/1.jpg) se concatena con API_BASE.
- * - Si el objeto tiene la forma { url: '...' } se extrae la propiedad.
- * - Si no hay imagen, devuelve la imagen por defecto local (`images/sample1.svg`).
+ * Resolves an image reference from the API.
+ * - If absolute URL (http/https), returns as is.
+ * - If relative path (e.g. /uploads/1.jpg), prepends API_BASE.
+ * - If object with { url: '...' }, extracts the property.
+ * - If missing, returns a default local image.
  */
 function resolveImageUrl(img) {
-  if (!img) return 'images/sample1.svg';
+  if (!img) return 'images/img_place.png';
   if (typeof img === 'string') {
     if (img.startsWith('http://') || img.startsWith('https://')) return img;
     if (img.startsWith('/')) return API_BASE + img;
-    // si viene como ruta relativa sin slash, asumimos que es relativa al API
+    // If relative path without slash, assume relative to API
     return API_BASE + '/' + img;
   }
   if (typeof img === 'object' && img.url) return resolveImageUrl(img.url);
@@ -33,13 +34,16 @@ function resolveImageUrl(img) {
 
 function setCookie(name, value, days = 1) {
   const expires = new Date(Date.now() + days * 864e5).toUTCString();
-  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
+  // Add SameSite to improve cross-site behavior; do not set Secure to allow localhost HTTP
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
 }
 
 function getCookie(name) {
   return document.cookie.split('; ').reduce((r, v) => {
     const parts = v.split('=');
-    return parts[0] === name ? decodeURIComponent(parts[1]) : r;
+    const key = parts.shift();
+    const val = parts.join('=');
+    return key === name ? decodeURIComponent(val) : r;
   }, '');
 }
 
@@ -47,13 +51,88 @@ function deleteCookie(name) {
   setCookie(name, '', -1);
 }
 
+// Variable to prevent redirect loops
+let __redirectLock = false;
+
+// Debug logger for development
+function debugLog(...args) {
+  try { console.debug('[HBnB]', ...args); } catch (e) {}
+}
+
+/**
+ * Redirects to a URL, but prevents infinite loops.
+ * Used for login/logout navigation.
+ */
+function guardedRedirect(url) {
+  if (__redirectLock) {
+    debugLog('Redirect blocked (lock active):', url);
+    return;
+  }
+  __redirectLock = true;
+  debugLog('Redirecting to:', url);
+  setTimeout(() => { window.location.href = url; }, 100);
+}
+
 /* =======================
-   Navbar y Footer
+  UI Helpers: Loading & Buttons
+  - Spinner and button loading state
+======================= */
+function createSpinnerEl() {
+  const s = document.createElement('span');
+  s.className = 'hbnb-spinner';
+  s.setAttribute('role', 'status');
+  s.setAttribute('aria-hidden', 'true');
+  return s;
+}
+
+function setButtonLoading(btn, loading = true) {
+  if (!btn) return;
+  if (loading) {
+    btn.dataset.orig = btn.innerHTML;
+    btn.classList.add('btn-disabled');
+    btn.setAttribute('aria-busy', 'true');
+    btn.innerHTML = '';
+    btn.appendChild(createSpinnerEl());
+    const text = document.createElement('span');
+    text.textContent = ' Loading';
+    btn.appendChild(text);
+  } else {
+    btn.classList.remove('btn-disabled');
+    btn.removeAttribute('aria-busy');
+    if (btn.dataset.orig) btn.innerHTML = btn.dataset.orig;
+  }
+}
+
+/* ======================
+  Token storage helpers
+  - Use localStorage for JWT, fallback to cookie for compatibility
+====================== */
+function setToken(token) {
+  try {
+    localStorage.setItem('hbnb_token', token);
+  } catch (e) { /* ignore */ }
+}
+
+function getToken() {
+  try {
+    const t = localStorage.getItem('hbnb_token');
+    return t || '';
+  } catch (e) { return ''; }
+}
+
+function deleteToken() {
+  try { localStorage.removeItem('hbnb_token'); } catch (e) {}
+  try { deleteCookie('token'); } catch (e) {}
+}
+
+/* =======================
+  Navbar and Footer
+  - Renders navigation and copyright
 ======================= */
 function setupNavbarFooter() {
   const header = document.querySelector('header');
   if (header) {
-    const token = getCookie('token');
+    const token = getToken();
     // Renderiza el header acorde al estado de autenticación
     header.innerHTML = `
       <img src="images/logo.png" alt="HBnB Logo" class="logo">
@@ -67,8 +146,8 @@ function setupNavbarFooter() {
     const logoutLink = document.getElementById('logout-link');
     if (logoutLink) {
       logoutLink.addEventListener('click', () => {
-        deleteCookie('token');
-        window.location.href = 'login.html';
+        deleteToken();
+        guardedRedirect('login.html');
       });
     }
 
@@ -84,20 +163,32 @@ function setupNavbarFooter() {
 }
 
 /* =======================
-   Login Page
+  Login Page
+  - Handles login form and authentication
 ======================= */
 function setupLogin() {
   const loginForm = document.getElementById('login-form');
   const loginMessage = document.getElementById('login-message');
+  debugLog('setupLogin initialized');
   if (!loginForm) return;
+  // If already authenticated, go to index
+  const existing = getToken();
+  if (existing) {
+    debugLog('Login page: token present, redirecting to index');
+    guardedRedirect('index.html');
+    return;
+  }
 
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
+    const submitBtn = loginForm.querySelector('button[type="submit"]');
+    setButtonLoading(submitBtn, true);
+    if (loginMessage) { loginMessage.setAttribute('aria-live', 'polite'); }
 
     try {
-      const response = await fetch('http://127.0.0.1:5002/api/v1/auth/login', {
+      const response = await fetch(`${API_BASE}/api/v1/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -105,10 +196,10 @@ function setupLogin() {
 
       if (response.ok) {
         const data = await response.json();
-          // Guardar token JWT en cookie para sesiones en el cliente
-          setCookie('token', data.access_token);
-          // Redirigir al índice (lista de lugares)
-          window.location.href = 'index.html';
+        // Guardar token JWT en localStorage (con fallback a cookie)
+        setToken(data.access_token);
+        // Redirigir al índice (lista de lugares)
+        guardedRedirect('index.html');
       } else {
         const data = await response.json();
         loginMessage.textContent = 'Login failed: ' + (data.error || response.statusText);
@@ -116,31 +207,63 @@ function setupLogin() {
     } catch (err) {
       console.error(err);
       loginMessage.textContent = 'Error connecting to server';
+    } finally {
+      setButtonLoading(submitBtn, false);
     }
   });
 }
 
 /* =======================
-   Index Page - Fetch & Display Places
+  Index Page - Fetch & Display Places
+  - Loads places after login
 ======================= */
 async function fetchPlaces() {
-  const token = getCookie('token');
+  const token = getToken();
+  debugLog('fetchPlaces token present:', !!token);
   if (!token) {
     // Redirect to login if not authenticated (index requires auth)
-    window.location.href = 'login.html';
+    debugLog('No token found, redirecting to login');
+    guardedRedirect('login.html');
     return;
   }
 
   try {
-    const response = await fetch('http://127.0.0.1:5002/api/v1/places', {
+    const list = document.getElementById('places-list');
+    if (list) {
+      list.setAttribute('aria-busy', 'true');
+      const s = createSpinnerEl();
+      s.style.margin = '12px';
+      list.innerHTML = '';
+      list.appendChild(s);
+    }
+
+    const response = await fetch(`${API_BASE}/api/v1/places`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-      if (!response.ok) throw new Error('Failed fetching places');
-      const data = await response.json();
-      // Mostrar lugares en la interfaz
-      displayPlaces(data);
-  } catch (err) {
-    console.error(err);
+    if (!response.ok) throw new Error('Failed fetching places');
+    const data = await response.json();
+    debugLog('fetchPlaces received items:', Array.isArray(data) ? data.length : typeof data);
+    // Render places in the UI
+    displayPlaces(data);
+    if (list) list.removeAttribute('aria-busy');
+  } catch (error) {
+    console.error(error);
+    // Show error message in UI
+    let errorDiv = document.getElementById('fetch-error');
+    if (!errorDiv) {
+      errorDiv = document.createElement('div');
+      errorDiv.id = 'fetch-error';
+      errorDiv.style.color = 'red';
+      errorDiv.style.background = '#fff0f0';
+      errorDiv.style.padding = '10px';
+      errorDiv.style.margin = '10px 0';
+      errorDiv.style.border = '1px solid #f99';
+      errorDiv.style.fontWeight = 'bold';
+      errorDiv.setAttribute('role', 'alert');
+      const container = document.getElementById('places-list')?.parentNode || document.body;
+      container.insertBefore(errorDiv, container.firstChild);
+    }
+    errorDiv.textContent = `Error fetching places: ${error.message}`;
   }
 }
 
@@ -148,6 +271,7 @@ function displayPlaces(places) {
   const list = document.getElementById('places-list');
   if (!list) return;
   list.innerHTML = '';
+  debugLog('displayPlaces count:', places ? places.length : 0);
 
   places.forEach(place => {
     const div = document.createElement('div');
@@ -168,7 +292,8 @@ function displayPlaces(places) {
 }
 
 /* =======================
-   Filter Places by Price
+  Filter Places by Price
+  - Dropdown to filter places by price
 ======================= */
 function setupPriceFilter() {
   const filter = document.getElementById('price-filter');
@@ -184,21 +309,34 @@ function setupPriceFilter() {
 }
 
 /* =======================
-   Place Details Page
+  Place Details Page
+  - Shows details and reviews for a place
 ======================= */
 async function fetchPlaceDetails() {
   const params = new URLSearchParams(window.location.search);
   const placeId = params.get('id');
   if (!placeId) return;
 
-  const token = getCookie('token');
+  const token = getToken();
+  debugLog('fetchPlaceDetails id:', placeId, 'hasToken:', !!token);
   try {
-    const response = await fetch(`http://127.0.0.1:5002/api/v1/places/${placeId}`, {
+    const section = document.getElementById('place-details');
+    if (section) {
+      section.setAttribute('aria-busy', 'true');
+      section.innerHTML = '';
+      const spinner = createSpinnerEl();
+      spinner.style.display = 'block';
+      spinner.style.margin = '18px auto';
+      section.appendChild(spinner);
+    }
+
+    const response = await fetch(`${API_BASE}/api/v1/places/${placeId}`, {
       headers: token ? { 'Authorization': `Bearer ${token}` } : {}
     });
     if (!response.ok) throw new Error('Failed fetching place details');
     const place = await response.json();
     displayPlaceDetails(place);
+    if (section) section.removeAttribute('aria-busy');
   } catch (err) {
     console.error(err);
   }
@@ -207,6 +345,7 @@ async function fetchPlaceDetails() {
 function displayPlaceDetails(place) {
   const section = document.getElementById('place-details');
   if (!section) return;
+  debugLog('displayPlaceDetails for:', place && (place.id || place.name));
 
   // host info
   const host = place.host || place.host_name || place.user || place.owner || '';
@@ -236,18 +375,20 @@ function displayPlaceDetails(place) {
   section.appendChild(reviewsSection);
 
   const addReviewSection = document.getElementById('add-review');
-  if (addReviewSection) addReviewSection.style.display = getCookie('token') ? 'block' : 'none';
+  if (addReviewSection) addReviewSection.style.display = getToken() ? 'block' : 'none';
 }
 
 /* =======================
-   Add Review
+  Add Review
+  - Handles review form submission
 ======================= */
 function setupAddReview() {
   const reviewForm = document.getElementById('review-form');
   // Redirect unauthenticated users immediately to index (per assignment)
-  const token = getCookie('token');
+  const token = getToken();
   if (!token) {
-    window.location.href = 'index.html';
+    debugLog('Add-review: no token, redirecting to index');
+    guardedRedirect('index.html');
     return;
   }
   if (!reviewForm) return;
@@ -260,15 +401,17 @@ function setupAddReview() {
     const params = new URLSearchParams(window.location.search);
     const placeId = params.get('id');
     const reviewText = document.getElementById('review-text').value;
+    const submitBtn = reviewForm.querySelector('button[type="submit"]');
+    setButtonLoading(submitBtn, true);
 
     try {
-      const response = await fetch(`http://127.0.0.1:5002/api/v1/places/${placeId}/reviews`, {
+      const response = await fetch(`${API_BASE}/api/v1/reviews`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ text: reviewText })
+        body: JSON.stringify({ text: reviewText, place_id: parseInt(placeId, 10) })
       });
 
       if (response.ok) {
@@ -283,18 +426,40 @@ function setupAddReview() {
       console.error(err);
       alert('Error submitting review');
     }
+      setButtonLoading(submitBtn, false);
   });
 }
 
 /* =======================
-   Initialize Page
+  Initialize Page
+  - Detects which page is loaded and runs the right setup
 ======================= */
 document.addEventListener('DOMContentLoaded', () => {
+  // Trace at load start for debugging redirect loop
+  try {
+    const token = getToken();
+    debugLog('DOM ready. token present:', !!token, 'token_len:', token ? token.length : 0);
+    // also store a persistent trace to inspect after redirects
+    const traces = JSON.parse(localStorage.getItem('hbnb_traces') || '[]');
+    traces.push({ ts: Date.now(), href: window.location.href, token_len: token ? token.length : 0 });
+    localStorage.setItem('hbnb_traces', JSON.stringify(traces.slice(-50)));
+  } catch (e) { console.error(e); }
   setupNavbarFooter();
-  setupLogin();
-  setupPriceFilter();
-  setupAddReview();
-
-  if (document.getElementById('places-list')) fetchPlaces();
-  if (document.getElementById('place-details')) fetchPlaceDetails();
+  // Solo ejecutar setupLogin si estamos en login.html
+  if (document.getElementById('login-form')) {
+    setupLogin();
+    return;
+  }
+  // Solo ejecutar fetchPlaces y filtro en index.html
+  if (document.getElementById('places-list')) {
+    setupPriceFilter();
+    fetchPlaces();
+    return;
+  }
+  // Solo ejecutar detalles y review en place.html
+  if (document.getElementById('place-details')) {
+    fetchPlaceDetails();
+    setupAddReview();
+    return;
+  }
 });

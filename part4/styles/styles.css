@@ -1,7 +1,119 @@
+/*
+  HBnB Stylesheet
+  - Modern, clean, and responsive look
+  - All UI in English for Holberton
+  - Documented for easy explanation
+*/
+
+body {
+  font-family: 'Montserrat', Arial, sans-serif;
+  background: #f8f9fa;
+  margin: 0;
+  color: #222;
+}
+
+header, footer {
+  background: #fff;
+  padding: 18px 0;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 16px 48px 16px;
+}
+
+/* Hero section: large, centered image and text */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+.hero-image {
+  width: 320px;
+  max-width: 90vw;
+  height: auto;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  margin-bottom: 18px;
+}
+.hero-text h1 {
+  font-size: 2.5rem;
+  margin: 0 0 8px 0;
+  color: #2d3a4a;
+}
+.hero-text p {
+  font-size: 1.2rem;
+  color: #555;
+  margin: 0 0 8px 0;
+}
+
+h1 {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 18px;
+}
+
+label, select {
+  font-size: 1rem;
+  margin-right: 8px;
+}
+
+/* Place cards grid */
+.places-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+/* Place card styling */
 .place-card,
 .review-card {
   margin: 20px;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transition: box-shadow 0.2s;
+}
+.place-card:hover {
+  box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+}
+.place-thumb {
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+.place-description {
+  color: #444;
+  margin-bottom: 8px;
+}
+.place-price {
+  font-weight: bold;
+  color: #2d3a4a;
+  margin-bottom: 8px;
+}
+.details-button {
+  display: inline-block;
+  padding: 8px 18px;
+  background: #2d3a4a;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.2s;
+  margin-top: 8px;
+}
+.details-button:hover {
+  background: #4e5d6c;
+}
 }

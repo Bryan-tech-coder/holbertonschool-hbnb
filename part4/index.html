@@ -12,15 +12,18 @@
   <header></header>
 
   <main>
+    <!-- Hero section: visually engaging intro -->
     <section class="hero">
-      <img src="images/house_icon.jpg" alt="HBnB hero" class="hero-image">
+      <img src="images/img_index.png" alt="HBnB hero" class="hero-image">
       <div class="hero-text">
-        <h1>Encuentra el lugar perfecto</h1>
-        <p>Explora alojamientos únicos cerca de ti.</p>
+        <h1>Find Your Perfect Place</h1>
+        <p>Discover unique stays and experiences around you.</p>
       </div>
     </section>
+    <!-- Main heading -->
     <h1>Places to Stay</h1>
 
+    <!-- Price filter dropdown -->
     <label for="price-filter">Filter by max price: </label>
     <select id="price-filter">
       <option value="All">All</option>
@@ -29,6 +32,7 @@
       <option value="100">$100</option>
     </select>
 
+    <!-- List of places will be rendered here by JS -->
     <div id="places-list" class="places-grid"></div>
   </main>
 

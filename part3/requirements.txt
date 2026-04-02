@@ -4,4 +4,6 @@ flask-bcrypt
 flask-jwt-extended
 flask-sqlalchemy
 sqlalchemy
-Flask-CORS==3.1.1
+Flask-Cors==3.0.10
+alembic
+gunicorn
