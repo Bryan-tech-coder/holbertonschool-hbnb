@@ -5,38 +5,80 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HBnB - Home</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles/styles.css">
   <link rel="icon" href="images/logo.png">
 </head>
 <body>
-  <header></header>
+  <header>
+    <nav class="navbar">
+      <img src="images/logo.png" alt="HBnB logo" class="logo">
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="login.html" class="login-button">Login</a>
+      </div>
+    </nav>
+  </header>
 
   <main>
-    <!-- Hero section: visually engaging intro -->
+    <!-- Main heading (reference-style) -->
     <section class="hero">
-      <img src="images/img_index.png" alt="HBnB hero" class="hero-image">
       <div class="hero-text">
-        <h1>Find Your Perfect Place</h1>
-        <p>Discover unique stays and experiences around you.</p>
+        <h1>Available Places</h1>
       </div>
     </section>
-    <!-- Main heading -->
-    <h1>Places to Stay</h1>
+
+    <section class="featured-places">
+      <div class="featured-card">
+        <a href="place.html?name=Skyline%20Loft" class="featured-link">
+          <img src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80" alt="Skyline Loft" class="featured-thumb">
+          <span class="featured-title">Skyline Loft</span>
+          <span class="featured-subtitle">From $140/night</span>
+          <span class="featured-meta">Downtown • 2 Guests • 1 Bath</span>
+          <span class="featured-summary">Bright loft with skyline views and a cozy reading nook.</span>
+          <span class="featured-badge">Available</span>
+          <span class="featured-amenities">Wi‑Fi • Workspace • Kitchen</span>
+        </a>
+      </div>
+      <div class="featured-card">
+        <a href="place.html?name=River%20Stone%20Cabin" class="featured-link">
+          <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=900&q=80" alt="River Stone Cabin" class="featured-thumb">
+          <span class="featured-title">River Stone Cabin</span>
+          <span class="featured-subtitle">From $110/night</span>
+          <span class="featured-meta">Forest • 4 Guests • Fireplace</span>
+          <span class="featured-summary">Rustic cabin surrounded by pines, perfect for unplugging.</span>
+          <span class="featured-badge">Popular</span>
+          <span class="featured-amenities">Fireplace • Trails • Parking</span>
+        </a>
+      </div>
+      <div class="featured-card">
+        <a href="place.html?name=Harbor%20View%20Suite" class="featured-link">
+          <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=900&q=80" alt="Harbor View Suite" class="featured-thumb">
+          <span class="featured-title">Harbor View Suite</span>
+          <span class="featured-subtitle">From $190/night</span>
+          <span class="featured-meta">Waterfront • 2 Guests • Balcony</span>
+          <span class="featured-summary">Modern suite with harbor views and sunset balcony.</span>
+          <span class="featured-badge">New</span>
+          <span class="featured-amenities">Balcony • Elevator • Gym</span>
+        </a>
+      </div>
+    </section>
 
     <!-- Price filter dropdown -->
-    <label for="price-filter">Filter by max price: </label>
-    <select id="price-filter">
-      <option value="All">All</option>
-      <option value="10">$10</option>
-      <option value="50">$50</option>
-      <option value="100">$100</option>
-    </select>
+    <div class="filter-row">
+      <label for="price-filter">Max Price:</label>
+      <select id="price-filter">
+        <option value="All">All</option>
+        <option value="10">$10</option>
+        <option value="50">$50</option>
+        <option value="100">$100</option>
+      </select>
+    </div>
 
     <!-- List of places will be rendered here by JS -->
     <div id="places-list" class="places-grid"></div>
   </main>
 
-  <footer></footer>
+  <footer>© 2026 HBnB. All rights reserved.</footer>
   <script src="scripts.js"></script>
 </body>
 </html>

@@ -135,11 +135,14 @@ function setupNavbarFooter() {
     const token = getToken();
     // Renderiza el header acorde al estado de autenticación
     header.innerHTML = `
-      <img src="images/logo.png" alt="HBnB Logo" class="logo">
-      <nav>
-        <a href="index.html">Home</a>
-        <a href="login.html" id="login-link" class="login-button">Login</a>
-        ${token ? '<a href="#" id="logout-link">Logout</a>' : ''}
+      <nav class="navbar">
+        <img src="images/logo.png" alt="HBnB Logo" class="logo">
+        <div class="nav-links">
+          <a href="index.html">Home</a>
+          <a href="place.html">Place</a>
+          <a href="add_review.html">Add Review</a>
+          ${token ? '<a href="#" id="logout-link">Logout</a>' : '<a href="login.html" id="login-link" class="login-button">Login</a>'}
+        </div>
       </nav>
     `;
 
@@ -153,7 +156,7 @@ function setupNavbarFooter() {
 
     // Ocultar login si ya está autenticado
     const loginLink = document.getElementById('login-link');
-    if (loginLink) loginLink.style.display = token ? 'none' : 'block';
+    if (loginLink) loginLink.style.display = token ? 'none' : 'inline-block';
   }
 
   const footer = document.querySelector('footer');
@@ -458,8 +461,34 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   // Solo ejecutar detalles y review en place.html
   if (document.getElementById('place-details')) {
+    const placeTitle = document.getElementById('place-title');
+    if (placeTitle) {
+      const params = new URLSearchParams(window.location.search);
+      const name = params.get('name');
+      if (name) {
+        placeTitle.textContent = name;
+        const addReviewLink = document.getElementById('add-review-link');
+        if (addReviewLink) {
+          addReviewLink.href = `add_review.html?name=${encodeURIComponent(name)}`;
+        }
+      }
+    }
     fetchPlaceDetails();
     setupAddReview();
+    return;
+  }
+  if (document.getElementById('review-title')) {
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get('name');
+    const reviewTitle = document.getElementById('review-title');
+    const placeSelect = document.getElementById('place-select');
+    if (name && reviewTitle) reviewTitle.textContent = `Reviewing: ${name}`;
+    if (name && placeSelect) placeSelect.value = name;
+    if (placeSelect && reviewTitle) {
+      placeSelect.addEventListener('change', () => {
+        reviewTitle.textContent = `Reviewing: ${placeSelect.value}`;
+      });
+    }
     return;
   }
 });

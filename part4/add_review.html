@@ -5,25 +5,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HBnB - Add Review</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles/styles.css">
   <link rel="icon" href="images/logo.png">
 </head>
 <body>
-  <header></header>
+  <header>
+    <nav class="navbar">
+      <img src="images/logo.png" alt="HBnB logo" class="logo">
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="login.html" class="login-button">Login</a>
+      </div>
+    </nav>
+  </header>
 
   <main>
-    <h1>Add Your Review</h1>
-    <img src="images/img_place_review.png" alt="Review banner" style="max-width:100%; margin-bottom:16px;">
-    <form id="review-form">
-      <label for="review-text">Your Review:</label>
-      <textarea id="review-text" rows="4" cols="50" placeholder="Write your review..." required></textarea>
-      <br>
-      <button type="submit">Submit Review</button>
-    </form>
+    <h1 id="review-title">Reviewing: Skyline Loft</h1>
+    <section class="add-review">
+      <form id="review-form" class="form">
+        <h2>Add a Review</h2>
+        <p class="form-hint">Share your experience to help other guests choose the best stay.</p>
+        <label for="review-text">Your Review:</label>
+        <textarea id="review-text" rows="4" placeholder="Write your review..." required></textarea>
+          <label for="place-select">Choose a place:</label>
+          <select id="place-select" required>
+            <option value="Skyline Loft">Skyline Loft</option>
+            <option value="River Stone Cabin">River Stone Cabin</option>
+            <option value="Harbor View Suite">Harbor View Suite</option>
+          </select>
+        <label for="rating">Rating:</label>
+        <select id="rating" required>
+          <option value="1">1 Star</option>
+          <option value="2">2 Stars</option>
+          <option value="3">3 Stars</option>
+          <option value="4">4 Stars</option>
+          <option value="5">5 Stars</option>
+        </select>
+        <button type="submit">Submit Review</button>
+      </form>
+    </section>
   </main>
 
-  <footer></footer>
-
+  <footer>© 2026 HBnB. All rights reserved.</footer>
   <script src="scripts.js"></script>
 </body>
 </html>

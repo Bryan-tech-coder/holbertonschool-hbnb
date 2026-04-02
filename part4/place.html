@@ -5,32 +5,58 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HBnB - Place Details</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles/styles.css">
   <link rel="icon" href="images/logo.png">
 </head>
 <body>
-  <header></header>
+  <header>
+    <nav class="navbar">
+      <img src="images/logo.png" alt="HBnB logo" class="logo">
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="login.html" class="login-button">Login</a>
+      </div>
+    </nav>
+  </header>
 
   <main>
-    <section id="place-details">
-      <!-- Aquí se agregará dinámicamente la información del lugar -->
-      <div class="place-hero">
-        <img src="images/img_place.png" alt="Place image" class="place-hero-image">
+    <section class="place-gallery">
+      <img src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80" alt="Place photo 1" class="gallery-photo">
+      <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=900&q=80" alt="Place photo 2" class="gallery-photo">
+      <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=900&q=80" alt="Place photo 3" class="gallery-photo">
+    </section>
+
+    <section id="place-details" class="place-details">
+      <h1 id="place-title">Skyline Loft</h1>
+      <div class="place-info">
+        <p><strong>Host:</strong> Lina Torres</p>
+        <p><strong>Price per night:</strong> $140</p>
+        <p><strong>Description:</strong> A bright loft with skyline views, minimalist decor, and a cozy reading nook.</p>
+        <p><strong>Amenities:</strong> High-Speed WiFi, Workspace, Smart TV, Kitchen</p>
+        <p><strong>Check-in:</strong> 3:00 PM • <strong>Check-out:</strong> 11:00 AM</p>
+        <p><strong>House rules:</strong> No smoking • No parties</p>
+        <p><strong>Amenities:</strong> High-Speed WiFi, Workspace, Smart TV, Kitchen</p>
       </div>
     </section>
 
-    <!-- Add Review Section -->
-    <section id="add-review" style="display:none;">
-      <h2>Add Your Review</h2>
-      <form id="review-form">
-        <textarea id="review-text" rows="4" cols="50" placeholder="Write your review..." required></textarea>
-        <br>
-        <button type="submit">Submit Review</button>
-      </form>
+    <section class="reviews">
+      <h2>Reviews</h2>
+      <article class="review-card">
+        <p><strong>Maya Lee:</strong> Super clean, quiet at night, and close to cafés.</p>
+        <p>Rating: ★★★★☆</p>
+      </article>
+      <article class="review-card">
+        <p><strong>Diego Ruiz:</strong> Great views and fast WiFi. Perfect for remote work.</p>
+        <p>Rating: ★★★★★</p>
+      </article>
+    </section>
+
+    <section class="add-review" id="add-review" style="display:none;">
+      <a id="add-review-link" href="add_review.html" class="details-button">Add Review</a>
     </section>
   </main>
 
-  <footer></footer>
+  <footer>© 2026 HBnB. All rights reserved.</footer>
   <script src="scripts.js"></script>
 </body>
 </html>

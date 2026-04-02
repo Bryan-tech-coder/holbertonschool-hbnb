@@ -1,119 +1,403 @@
-/*
-  HBnB Stylesheet
-  - Modern, clean, and responsive look
-  - All UI in English for Holberton
-  - Documented for easy explanation
-*/
+/* HBnB Stylesheet - Holberton compliant */
 
-body {
-  font-family: 'Montserrat', Arial, sans-serif;
-  background: #f8f9fa;
-  margin: 0;
-  color: #222;
+:root {
+  --primary: #2563eb;
+  --primary-dark: #1e40af;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --card: #ffffff;
+  --bg: #f3f4f6;
+  --border: #d1d5db;
+  --shadow: 0 10px 25px rgba(31, 41, 55, 0.12);
 }
 
-header, footer {
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Montserrat', 'Segoe UI', sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 30%),
+    linear-gradient(180deg, #f5f6f8 0%, #eef2f7 100%);
+  margin: 0;
+  color: var(--text);
+}
+
+header {
+  background: var(--primary);
+  padding: 14px 24px;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+  gap: 16px;
+}
+
+.logo {
+  height: 34px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  margin-left: auto;
+}
+
+.nav-links a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.login-button {
   background: #fff;
-  padding: 18px 0;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  color: var(--primary-dark);
+  padding: 8px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 700;
+  display: inline-block;
 }
 
 main {
-  max-width: 900px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 32px 16px 48px 16px;
-}
-
-/* Hero section: large, centered image and text */
-.hero {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 32px;
-}
-.hero-image {
-  width: 320px;
-  max-width: 90vw;
-  height: auto;
-  border-radius: 18px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
-  margin-bottom: 18px;
-}
-.hero-text h1 {
-  font-size: 2.5rem;
-  margin: 0 0 8px 0;
-  color: #2d3a4a;
-}
-.hero-text p {
-  font-size: 1.2rem;
-  color: #555;
-  margin: 0 0 8px 0;
-}
-
-h1 {
+  padding: 32px 16px 40px 16px;
   text-align: center;
-  margin-top: 0;
-  margin-bottom: 18px;
 }
 
-label, select {
-  font-size: 1rem;
-  margin-right: 8px;
+footer {
+  background: var(--primary);
+  color: #fff;
+  text-align: center;
+  padding: 12px 0;
+  margin-top: 40px;
 }
 
-/* Place cards grid */
-.places-grid {
+/* Hero Section */
+.hero {
+  text-align: center;
+  margin: 18px auto 14px auto;
+  max-width: 760px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+.hero h1 {
+  margin: 0 0 6px 0;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.hero-text p {
+  color: var(--muted);
+  margin: 0;
+}
+
+/* Featured clickable image cards */
+.featured-places {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 24px;
-  margin-top: 24px;
+  margin: 16px auto 24px auto;
+  max-width: 1100px;
 }
 
-/* Place card styling */
-.place-card,
-.review-card {
-  margin: 20px;
-  padding: 10px;
-  border: 1px solid #ddd;
+.featured-card {
+  background: var(--card);
+  border: 1px solid var(--border);
   border-radius: 10px;
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  transition: box-shadow 0.2s;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  text-align: center;
 }
-.place-card:hover {
-  box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+
+.featured-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  padding: 12px;
 }
-.place-thumb {
+
+.featured-image {
   width: 100%;
-  max-height: 180px;
+  height: 160px;
   object-fit: cover;
   border-radius: 8px;
   margin-bottom: 10px;
 }
-.place-description {
-  color: #444;
-  margin-bottom: 8px;
+
+.featured-title {
+  font-weight: 700;
+  color: var(--text);
 }
-.place-price {
-  font-weight: bold;
-  color: #2d3a4a;
-  margin-bottom: 8px;
+
+h1, h2 {
+  margin: 0 0 12px 0;
 }
-.details-button {
+
+/* Custom featured cards (image-free) */
+.featured-places {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  margin: 16px auto 24px auto;
+  max-width: 1100px;
+}
+
+.featured-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.featured-link {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.featured-title {
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.featured-subtitle {
+  color: var(--muted);
+}
+
+.featured-summary {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.featured-badge {
   display: inline-block;
-  padding: 8px 18px;
-  background: #2d3a4a;
+  align-self: center;
+  background: var(--primary);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.featured-amenities {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.featured-thumb {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.featured-meta {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* Cards - required specs */
+.place-card,
+.review-card {
+  margin: 20px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  text-align: center;
+  min-width: 240px;
+  max-width: 280px;
+  width: 100%;
+}
+
+.place-card img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+/* Grid */
+
+label[for="price-filter"] {
+  margin-right: 8px;
+}
+
+/* Filter row */
+.filter-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  justify-content: center;
+}
+
+main {
+  text-align: center;
+}
+
+.places-grid {
+  text-align: left;
+  margin-top: 12px;
+}
+
+/* Place details */
+.place-details {
+  margin-bottom: 20px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(31, 41, 55, 0.10);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 24px;
+}
+
+.place-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 0 auto 18px auto;
+  max-width: 900px;
+}
+
+.gallery-photo {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.place-info {
+  margin-top: 8px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.place-details,
+.reviews {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.place-info,
+.review-card {
+  width: 100%;
+  max-width: 760px;
+}
+
+.reviews h2 {
+  width: 100%;
+  max-width: 760px;
+  text-align: left;
+  margin-bottom: 8px;
+}
+
+/* Review form */
+.add-review {
+  margin-top: 30px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(31, 41, 55, 0.12);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+
+.form-hint {
+  color: var(--muted);
+  margin: 0 0 6px 0;
+}
+
+.form input,
+.form textarea,
+.form select {
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.form button {
+  background: var(--primary);
   color: #fff;
   border: none;
+  padding: 10px 12px;
   border-radius: 6px;
-  text-decoration: none;
-  font-weight: 600;
-  transition: background 0.2s;
-  margin-top: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
 }
-.details-button:hover {
-  background: #4e5d6c;
+
+.form button:hover {
+  background: var(--primary-dark);
 }
+
+/* Login */
+body.login-page main {
+  max-width: 420px;
+}
+
+.login-form {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: var(--shadow);
+}
+
+.login-form input {
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.login-form button {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.login-form button:hover {
+  background: var(--primary-dark);
 }
