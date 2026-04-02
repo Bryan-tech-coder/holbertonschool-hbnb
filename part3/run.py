@@ -22,4 +22,7 @@ def serve_frontend(filename):
     return send_from_directory(PART4_DIR, filename)
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5002)
+    # Permitir cambiar el puerto mediante la variable de entorno PORT.
+    # Esto facilita arrancar múltiples instancias sin editar código.
+    port = int(os.environ.get('PORT', 5002))
+    app.run(debug=True, port=port)

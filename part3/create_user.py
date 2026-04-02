@@ -4,7 +4,7 @@ from app import create_app, db
 from app.models.user import User
 from app.persistence.repository import UserRepository
 from config import Config
-import bcrypt
+from app.models.user import bcrypt
 
 # Crear la app
 app = create_app(Config)
@@ -14,8 +14,7 @@ email = "admin@example.com"
 password_plain = "supersecretpassword"
 
 # Hashear la contraseña
-hashed_pw = bcrypt.hashpw(password_plain.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
-
+hashed_pw = bcrypt.generate_password_hash(password_plain).decode("utf-8")
 # Crear instancia del repositorio
 repo = UserRepository()
 

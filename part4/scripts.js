@@ -1,10 +1,36 @@
 /* =========================
-   HBnB - Client JS
+  HBnB - Client JS
+  Comentarios en español: este archivo controla el cliente (frontend)
+  - Maneja autenticación (cookies)
+  - Solicita datos al API (places, place details)
+  - Renderiza la interfaz: lista de lugares, detalles y formulario de reviews
 ========================= */
 
 /* =======================
    Utilities: Cookies
 ======================= */
+// URL base del API (ajusta si tu API corre en otra dirección/puerto)
+const API_BASE = 'http://127.0.0.1:5002';
+
+/**
+ * Resuelve una posible referencia a imagen proveniente del API.
+ * - Si es una URL absoluta (http/https) se devuelve tal cual.
+ * - Si es una ruta relativa (ej: /uploads/1.jpg) se concatena con API_BASE.
+ * - Si el objeto tiene la forma { url: '...' } se extrae la propiedad.
+ * - Si no hay imagen, devuelve la imagen por defecto local (`images/sample1.svg`).
+ */
+function resolveImageUrl(img) {
+  if (!img) return 'images/sample1.svg';
+  if (typeof img === 'string') {
+    if (img.startsWith('http://') || img.startsWith('https://')) return img;
+    if (img.startsWith('/')) return API_BASE + img;
+    // si viene como ruta relativa sin slash, asumimos que es relativa al API
+    return API_BASE + '/' + img;
+  }
+  if (typeof img === 'object' && img.url) return resolveImageUrl(img.url);
+  return 'images/sample1.svg';
+}
+
 function setCookie(name, value, days = 1) {
   const expires = new Date(Date.now() + days * 864e5).toUTCString();
   document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
@@ -28,11 +54,12 @@ function setupNavbarFooter() {
   const header = document.querySelector('header');
   if (header) {
     const token = getCookie('token');
+    // Renderiza el header acorde al estado de autenticación
     header.innerHTML = `
       <img src="images/logo.png" alt="HBnB Logo" class="logo">
       <nav>
         <a href="index.html">Home</a>
-        <a href="login.html" id="login-link">Login</a>
+        <a href="login.html" id="login-link" class="login-button">Login</a>
         ${token ? '<a href="#" id="logout-link">Logout</a>' : ''}
       </nav>
     `;
@@ -78,8 +105,10 @@ function setupLogin() {
 
       if (response.ok) {
         const data = await response.json();
-        setCookie('token', data.access_token);
-        window.location.href = 'index.html';
+          // Guardar token JWT en cookie para sesiones en el cliente
+          setCookie('token', data.access_token);
+          // Redirigir al índice (lista de lugares)
+          window.location.href = 'index.html';
       } else {
         const data = await response.json();
         loginMessage.textContent = 'Login failed: ' + (data.error || response.statusText);
@@ -96,13 +125,20 @@ function setupLogin() {
 ======================= */
 async function fetchPlaces() {
   const token = getCookie('token');
+  if (!token) {
+    // Redirect to login if not authenticated (index requires auth)
+    window.location.href = 'login.html';
+    return;
+  }
+
   try {
     const response = await fetch('http://127.0.0.1:5002/api/v1/places', {
-      headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      headers: { 'Authorization': `Bearer ${token}` }
     });
-    if (!response.ok) throw new Error('Failed fetching places');
-    const data = await response.json();
-    displayPlaces(data);
+      if (!response.ok) throw new Error('Failed fetching places');
+      const data = await response.json();
+      // Mostrar lugares en la interfaz
+      displayPlaces(data);
   } catch (err) {
     console.error(err);
   }
@@ -116,10 +152,15 @@ function displayPlaces(places) {
   places.forEach(place => {
     const div = document.createElement('div');
     div.className = 'place-card';
+    div.dataset.price = place.price;
+    // determinar imagen usando resolveImageUrl
+    const imgSrc = resolveImageUrl(place.image || (place.images && place.images[0]));
+
     div.innerHTML = `
+      <img src="${imgSrc}" alt="${place.name}" class="place-thumb">
       <h3>${place.name}</h3>
-      <p>${place.description}</p>
-      <p>Price: $${place.price}</p>
+      <p class="place-description">${place.description || ''}</p>
+      <p class="place-price">Price: $<span class="price-value">${place.price}</span></p>
       <a href="place.html?id=${place.id}" class="details-button">View Details</a>
     `;
     list.appendChild(div);
@@ -136,7 +177,7 @@ function setupPriceFilter() {
   filter.addEventListener('change', (e) => {
     const value = e.target.value;
     document.querySelectorAll('.place-card').forEach(card => {
-      const price = parseFloat(card.querySelector('p:nth-child(3)').textContent.replace('Price: $', ''));
+      const price = parseFloat(card.dataset.price || card.querySelector('.price-value')?.textContent || '0');
       card.style.display = (value === 'All' || price <= parseFloat(value)) ? 'block' : 'none';
     });
   });
@@ -167,11 +208,19 @@ function displayPlaceDetails(place) {
   const section = document.getElementById('place-details');
   if (!section) return;
 
+  // host info
+  const host = place.host || place.host_name || place.user || place.owner || '';
+
+  // image: resolver posibles rutas proporcionadas por el API
+  const imgSrc = resolveImageUrl(place.image || (place.images && place.images[0]));
+
   section.innerHTML = `
+    <img src="${imgSrc}" alt="${place.name}" class="place-thumb">
     <h2>${place.name}</h2>
-    <p>${place.description}</p>
+    <p>${place.description || ''}</p>
+    <p>Host: ${host}</p>
     <p>Price: $${place.price}</p>
-    <p>Amenities: ${place.amenities.join(', ')}</p>
+    <p class="place-info">Amenities: ${Array.isArray(place.amenities) ? place.amenities.map(a => (typeof a === 'string' ? a : a.name || '')).filter(Boolean).join(', ') : ''}</p>
   `;
 
   const reviewsSection = document.createElement('div');
@@ -179,7 +228,9 @@ function displayPlaceDetails(place) {
   place.reviews.forEach(r => {
     const div = document.createElement('div');
     div.className = 'review-card';
-    div.innerHTML = `<p>${r.comment} - ${r.user}</p>`;
+    const user = r.user || r.user_name || r.username || '';
+    const rating = r.rating ? ` <strong>(${r.rating}/5)</strong>` : '';
+    div.innerHTML = `<p class="review-text">${r.comment || r.text}${rating}</p><p class="review-user">— ${user}</p>`;
     reviewsSection.appendChild(div);
   });
   section.appendChild(reviewsSection);
@@ -193,13 +244,18 @@ function displayPlaceDetails(place) {
 ======================= */
 function setupAddReview() {
   const reviewForm = document.getElementById('review-form');
+  // Redirect unauthenticated users immediately to index (per assignment)
+  const token = getCookie('token');
+  if (!token) {
+    window.location.href = 'index.html';
+    return;
+  }
   if (!reviewForm) return;
 
   reviewForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const token = getCookie('token');
-    if (!token) return window.location.href = 'login.html';
+    // token already checked on load
 
     const params = new URLSearchParams(window.location.search);
     const placeId = params.get('id');

@@ -4,24 +4,32 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HBnB - Home</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="images/logo.png">
 </head>
 <body>
   <header></header>
 
   <main>
+    <section class="hero">
+      <img src="images/house_icon.jpg" alt="HBnB hero" class="hero-image">
+      <div class="hero-text">
+        <h1>Encuentra el lugar perfecto</h1>
+        <p>Explora alojamientos únicos cerca de ti.</p>
+      </div>
+    </section>
     <h1>Places to Stay</h1>
 
     <label for="price-filter">Filter by max price: </label>
     <select id="price-filter">
       <option value="All">All</option>
       <option value="10">$10</option>
-      <option value="20">$20</option>
       <option value="50">$50</option>
       <option value="100">$100</option>
     </select>
 
-    <div id="places-list"></div>
+    <div id="places-list" class="places-grid"></div>
   </main>
 
   <footer></footer>
